@@ -34,5 +34,12 @@ with DAG(dag_id = "TwitterDag", start_date= pendulum.today('UTC').add(days=-2), 
                                                               "--dest", BASE_FOLDER.format(stage="Silver", partition=""),
                                                               "--process-date", "{{ ds }}"])
     
+    twitter_insight = SparkSubmitOperator(task_id="insight_twitter",
+                                            application="/home/marcelo/Documents/airflow/airflow_pipeline/src/spark/insight_tweet.py",
+                                            name="insight_twitter",
+                                            application_args=["--src", BASE_FOLDER.format(stage="Silver", partition=""),
+                                             "--dest", BASE_FOLDER.format(stage="Gold", partition=""),
+                                             "--process-date", "{{ ds }}"])
 
-twitter_operator >> twitter_transform
+
+twitter_operator >> twitter_transform >> twitter_insight
